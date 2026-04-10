@@ -7,110 +7,180 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #F5F0E8; --ink: #1A1A2E; --ink-muted: #4A4A6A; --ink-faint: #8888AA;
-    --accent: #2D6A4F; --accent-light: #52B788; --accent-pale: #D8F3DC;
-    --danger: #C1440E; --danger-pale: #FDE8DF; --gold: #B5860D;
-    --card-bg: #FEFCF8; --border: rgba(26,26,46,0.12); --border-strong: rgba(26,26,46,0.22);
-    --shadow: 0 4px 24px rgba(26,26,46,0.10),0 1px 4px rgba(26,26,46,0.06);
-    --shadow-card: 0 8px 40px rgba(26,26,46,0.14),0 2px 8px rgba(26,26,46,0.08);
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
-  header{display:flex;align-items:baseline;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);background:var(--card-bg)}
-  .logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;letter-spacing:-0.01em}
-  .logo sup{font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:400;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase;vertical-align:super;margin-left:4px}
-  .header-tag{font-size:0.78rem;color:var(--ink-faint);letter-spacing:0.06em;text-transform:uppercase}
-  main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2rem;gap:2rem;flex-wrap:wrap}
-  .left-col{display:flex;flex-direction:column;align-items:center;gap:1.1rem;flex:0 0 auto}
-  .note-card{width:340px;background:var(--card-bg);border-radius:18px;border:1px solid var(--border-strong);box-shadow:var(--shadow-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1rem 0;min-height:300px}
-  .note-card::before{content:'';position:absolute;inset:0;border-radius:18px;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(26,26,46,0.013) 40px,rgba(26,26,46,0.013) 41px);pointer-events:none}
-  .card-corner{position:absolute;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--ink-faint);opacity:.45}
-  .card-corner.tl{top:14px;left:18px} .card-corner.br{bottom:14px;right:18px;transform:rotate(180deg)}
-  .card-clef-badge{position:absolute;top:14px;right:18px;font-size:0.65rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);background:var(--cream);border:1px solid var(--border);border-radius:20px;padding:2px 8px}
-  #staffSvg{display:block}
-  .feedback-banner{height:28px;display:flex;align-items:center;justify-content:center;font-size:0.88rem;font-weight:500;border-radius:8px;padding:0 16px;width:340px;transition:background .2s,color .2s}
-  .feedback-banner.correct{background:var(--accent-pale);color:var(--accent)}
-  .feedback-banner.wrong{background:var(--danger-pale);color:var(--danger)}
-  .feedback-banner.idle{background:transparent;color:transparent}
-  .note-btns{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:340px}
-  .note-btn{padding:11px 4px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;cursor:pointer;border-radius:10px;border:1px solid var(--border-strong);background:var(--card-bg);color:var(--ink);transition:background .12s,transform .08s}
-  .note-btn:hover{background:var(--cream);transform:translateY(-1px)}
-  .note-btn:active{transform:scale(0.96)}
-  .note-btn.correct-flash{background:var(--accent-pale);border-color:var(--accent-light);color:var(--accent)}
-  .note-btn.wrong-flash{background:var(--danger-pale);border-color:var(--danger);color:var(--danger)}
-  .note-btn:disabled{cursor:default}
-  .progress-row{display:flex;flex-wrap:wrap;gap:4px;width:340px}
-  .dot{width:10px;height:10px;border-radius:50%;background:var(--border-strong);transition:background .2s}
-  .dot.ok{background:var(--accent-light)} .dot.bad{background:var(--danger)}
-  .right-col{display:flex;flex-direction:column;gap:1rem;width:260px;flex-shrink:0}
-  .panel{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;box-shadow:var(--shadow)}
-  .panel-title{font-size:0.68rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.85rem}
-  .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:0.5rem}
-  .timer-ring-wrap{position:relative;width:100px;height:100px}
-  .timer-ring-wrap svg{transform:rotate(-90deg)}
-  .timer-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .timer-seconds{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:600;line-height:1;color:var(--ink)}
-  .timer-sub{font-size:0.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
-  .card-counter{font-size:0.82rem;color:var(--ink-muted)}
-  .card-counter strong{color:var(--ink);font-weight:500}
-  .best-score{font-size:0.78rem;color:var(--ink-faint);text-align:center}
-  .best-score span{color:var(--gold);font-weight:500}
-  .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .metric{background:var(--cream);border-radius:10px;padding:0.6rem 0.75rem;display:flex;flex-direction:column;gap:2px}
-  .metric-label{font-size:0.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em}
-  .metric-value{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:var(--ink);line-height:1}
-  .metric-value.good{color:var(--accent)} .metric-value.warn{color:var(--gold)} .metric-value.bad{color:var(--danger)}
-  .settings-grid{display:flex;flex-direction:column;gap:0.65rem}
-  .setting-row label{display:block;font-size:0.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px}
-  select{width:100%;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888AA' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
-  select:focus{outline:2px solid var(--accent-light);outline-offset:1px}
-  .btn-primary{width:100%;padding:11px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;border-radius:10px;border:none;background:var(--ink);color:var(--cream);transition:background .15s,transform .08s}
-  .btn-primary:hover{background:var(--ink-muted)} .btn-primary:active{transform:scale(0.98)}
-  .btn-secondary{width:100%;padding:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;border-radius:10px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-muted);transition:background .12s}
-  .btn-secondary:hover{background:var(--cream)}
-  .overlay{position:fixed;inset:0;background:rgba(245,240,232,0.92);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100}
-  .overlay-box{background:var(--card-bg);border:1px solid var(--border-strong);border-radius:20px;box-shadow:var(--shadow-card);padding:2.5rem;width:460px;max-width:95vw}
-  .overlay-box h1{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;margin-bottom:0.3rem}
-  .overlay-box h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:1.5rem}
-  .overlay-box p{font-size:0.88rem;color:var(--ink-muted);margin-bottom:1.75rem;line-height:1.5}
-  .setup-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
-  .setup-field{display:flex;flex-direction:column;gap:5px}
-  .setup-field label{font-size:0.72rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em}
-  .results-score{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.4rem}
-  .results-pct{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:600;line-height:1}
-  .results-pct.great{color:var(--accent)} .results-pct.ok{color:var(--gold)} .results-pct.poor{color:var(--danger)}
-  .results-detail{font-size:0.88rem;color:var(--ink-muted);margin-bottom:0.75rem}
-  .results-best{font-size:0.82rem;margin-bottom:1.25rem;color:var(--ink-muted)}
-  .results-best strong{color:var(--gold);font-weight:500}
-  .results-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
-  .results-stat{background:var(--cream);border-radius:10px;padding:0.75rem;text-align:center}
-  .results-stat-val{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:600}
-  .results-stat-lbl{font-size:0.64rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
-  .results-missed{font-size:0.85rem;color:var(--ink-muted);margin-bottom:1.5rem;line-height:1.6}
-  .results-missed strong{color:var(--danger);font-weight:500}
-  .results-btns{display:flex;gap:8px}
-  .idle-staff{opacity:.3}
-  @media(max-width:720px){main{flex-direction:column;align-items:center}.right-col{width:340px}header{padding:1rem 1.25rem}}
+:root{
+  --cream:#F5F0E8;--ink:#1A1A2E;--ink-muted:#4A4A6A;--ink-faint:#8888AA;
+  --accent:#2D6A4F;--accent-light:#52B788;--accent-pale:#D8F3DC;
+  --danger:#C1440E;--danger-pale:#FDE8DF;--gold:#B5860D;--gold-pale:#FDF3D0;
+  --purple:#534AB7;--purple-pale:#EEEDFE;
+  --card-bg:#FEFCF8;--border:rgba(26,26,46,0.12);--border-strong:rgba(26,26,46,0.22);
+  --shadow:0 4px 24px rgba(26,26,46,0.10),0 1px 4px rgba(26,26,46,0.06);
+  --shadow-card:0 8px 40px rgba(26,26,46,0.14),0 2px 8px rgba(26,26,46,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;border-bottom:1px solid var(--border);background:var(--card-bg);gap:1rem;flex-wrap:wrap}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;letter-spacing:-0.01em;padding:1rem 0}
+.logo sup{font-family:'DM Sans',sans-serif;font-size:0.6rem;font-weight:400;color:var(--ink-faint);letter-spacing:0.08em;text-transform:uppercase;vertical-align:super;margin-left:4px}
+
+/* ── MODE TABS ── */
+.mode-tabs{display:flex;gap:4px;padding:8px 0}
+.mode-tab{padding:7px 18px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-faint);transition:all .15s}
+.mode-tab:hover{background:var(--cream);color:var(--ink)}
+.mode-tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+/* Student badge */
+.student-badge{font-size:0.8rem;color:var(--ink-faint);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:20px;white-space:nowrap}
+.student-badge:hover{border-color:var(--border-strong);color:var(--ink)}
+
+/* ── MAIN LAYOUT ── */
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2rem;gap:2rem;flex-wrap:wrap}
+.left-col{display:flex;flex-direction:column;align-items:center;gap:1.1rem;flex:0 0 auto}
+
+/* ── NOTE CARD ── */
+.note-card{width:340px;background:var(--card-bg);border-radius:18px;border:1px solid var(--border-strong);box-shadow:var(--shadow-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:1rem 0;min-height:300px}
+.note-card::before{content:'';position:absolute;inset:0;border-radius:18px;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(26,26,46,0.013) 40px,rgba(26,26,46,0.013) 41px);pointer-events:none}
+.card-corner{position:absolute;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--ink-faint);opacity:.45}
+.card-corner.tl{top:14px;left:18px}.card-corner.br{bottom:14px;right:18px;transform:rotate(180deg)}
+.card-clef-badge{position:absolute;top:14px;right:18px;font-size:0.65rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);background:var(--cream);border:1px solid var(--border);border-radius:20px;padding:2px 8px}
+#staffSvg{display:block}
+
+/* Feedback */
+.feedback-banner{height:28px;display:flex;align-items:center;justify-content:center;font-size:0.88rem;font-weight:500;border-radius:8px;padding:0 16px;width:340px;transition:background .2s,color .2s}
+.feedback-banner.correct{background:var(--accent-pale);color:var(--accent)}
+.feedback-banner.wrong{background:var(--danger-pale);color:var(--danger)}
+.feedback-banner.idle{background:transparent;color:transparent}
+
+/* Answer buttons — shared */
+.answer-btns{display:grid;gap:6px;width:340px}
+.answer-btns.cols-7{grid-template-columns:repeat(7,1fr)}
+.answer-btns.cols-4{grid-template-columns:repeat(4,1fr)}
+.answer-btns.cols-8{grid-template-columns:repeat(4,1fr)}
+.ans-btn{padding:11px 4px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;cursor:pointer;border-radius:10px;border:1px solid var(--border-strong);background:var(--card-bg);color:var(--ink);transition:background .12s,transform .08s;white-space:nowrap}
+.ans-btn:hover{background:var(--cream);transform:translateY(-1px)}
+.ans-btn:active{transform:scale(0.96)}
+.ans-btn.correct-flash{background:var(--accent-pale);border-color:var(--accent-light);color:var(--accent)}
+.ans-btn.wrong-flash{background:var(--danger-pale);border-color:var(--danger);color:var(--danger)}
+.ans-btn:disabled{cursor:default}
+
+/* Voice button row */
+.voice-row{display:flex;align-items:center;justify-content:center;gap:10px;width:340px;height:32px}
+.voice-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;border-radius:8px;border:1px solid var(--border-strong);background:var(--card-bg);color:var(--ink-muted);transition:all .15s}
+.voice-btn:hover{background:var(--cream)}
+.voice-btn.listening{background:var(--danger-pale);border-color:var(--danger);color:var(--danger);animation:pulse 1s infinite}
+.voice-btn.unsupported{opacity:.4;cursor:not-allowed}
+.voice-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.voice-heard{font-size:0.78rem;color:var(--ink-faint);min-width:60px}
+
+/* Progress dots */
+.progress-row{display:flex;flex-wrap:wrap;gap:4px;width:340px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border-strong);transition:background .2s}
+.dot.ok{background:var(--accent-light)}.dot.bad{background:var(--danger)}
+
+/* ── RIGHT COLUMN ── */
+.right-col{display:flex;flex-direction:column;gap:1rem;width:260px;flex-shrink:0}
+.panel{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;box-shadow:var(--shadow)}
+.panel-title{font-size:0.68rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.85rem}
+
+/* Timer */
+.timer-wrap{display:flex;flex-direction:column;align-items:center;gap:0.5rem}
+.timer-ring-wrap{position:relative;width:100px;height:100px}
+.timer-ring-wrap svg{transform:rotate(-90deg)}
+.timer-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-seconds{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:600;line-height:1;color:var(--ink)}
+.timer-sub{font-size:0.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
+.card-counter{font-size:0.82rem;color:var(--ink-muted)}
+.card-counter strong{color:var(--ink);font-weight:500}
+.best-score{font-size:0.78rem;color:var(--ink-faint);text-align:center}
+.best-score span{color:var(--gold);font-weight:500}
+
+/* Metrics */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:var(--cream);border-radius:10px;padding:0.6rem 0.75rem;display:flex;flex-direction:column;gap:2px}
+.metric-label{font-size:0.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em}
+.metric-value{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:var(--ink);line-height:1}
+.metric-value.good{color:var(--accent)}.metric-value.warn{color:var(--gold)}.metric-value.bad{color:var(--danger)}
+
+/* Settings */
+.settings-grid{display:flex;flex-direction:column;gap:0.65rem}
+.setting-row label{display:block;font-size:0.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px}
+select,input[type=text]{width:100%;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;appearance:none;cursor:pointer}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888AA' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-color:var(--cream)}
+select:focus,input[type=text]:focus{outline:2px solid var(--accent-light);outline-offset:1px}
+input[type=text]::placeholder{color:var(--ink-faint)}
+
+.btn-primary{width:100%;padding:11px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;border-radius:10px;border:none;background:var(--ink);color:var(--cream);transition:background .15s,transform .08s}
+.btn-primary:hover{background:var(--ink-muted)}.btn-primary:active{transform:scale(0.98)}
+.btn-secondary{width:100%;padding:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;border-radius:10px;border:1px solid var(--border-strong);background:transparent;color:var(--ink-muted);transition:background .12s}
+.btn-secondary:hover{background:var(--cream)}
+
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(245,240,232,0.93);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100}
+.overlay-box{background:var(--card-bg);border:1px solid var(--border-strong);border-radius:20px;box-shadow:var(--shadow-card);padding:2.5rem;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.overlay-box h1{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;margin-bottom:0.3rem}
+.overlay-box h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:1.5rem}
+.overlay-box p{font-size:0.88rem;color:var(--ink-muted);margin-bottom:1.5rem;line-height:1.5}
+.setup-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+.setup-field{display:flex;flex-direction:column;gap:5px}
+.setup-field.full{grid-column:1/-1}
+.setup-field label{font-size:0.72rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em}
+.setup-section{font-size:0.68rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin:1rem 0 0.6rem;padding-top:1rem;border-top:1px solid var(--border)}
+
+/* Results */
+.results-score{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.4rem}
+.results-pct{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:600;line-height:1}
+.results-pct.great{color:var(--accent)}.results-pct.ok{color:var(--gold)}.results-pct.poor{color:var(--danger)}
+.results-detail{font-size:0.88rem;color:var(--ink-muted);margin-bottom:0.75rem}
+.results-best{font-size:0.82rem;margin-bottom:1.25rem;color:var(--ink-muted)}
+.results-best strong{color:var(--gold);font-weight:500}
+.results-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.results-stat{background:var(--cream);border-radius:10px;padding:0.75rem;text-align:center}
+.results-stat-val{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:600}
+.results-stat-lbl{font-size:0.64rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
+.results-missed{font-size:0.85rem;color:var(--ink-muted);margin-bottom:1.5rem;line-height:1.7}
+.results-missed strong{color:var(--danger);font-weight:500}
+.results-btns{display:flex;gap:8px}
+
+/* Key sig pill on card */
+.key-pill{position:absolute;bottom:14px;left:18px;font-size:0.65rem;font-weight:500;letter-spacing:0.06em;color:var(--purple);background:var(--purple-pale);border-radius:20px;padding:2px 8px}
+
+.idle-staff{opacity:.3}
+@media(max-width:720px){main{flex-direction:column;align-items:center}.right-col{width:340px}header{padding:.75rem 1rem}}
 </style>
 </head>
 <body>
+
 <header>
   <div class="logo">Sight Reading<sup>101</sup></div>
-  <div class="header-tag">Note recognition trainer</div>
+  <nav class="mode-tabs">
+    <button class="mode-tab active" onclick="switchMode('notes')" id="tabNotes">Notes</button>
+    <button class="mode-tab" onclick="switchMode('intervals')" id="tabIntervals">Intervals</button>
+  </nav>
+  <div class="student-badge" id="studentBadge" onclick="promptStudentName()">Student: —</div>
 </header>
+
 <main>
   <div class="left-col">
     <div class="note-card" id="noteCard">
       <div class="card-corner tl">♩</div>
       <div class="card-corner br">♩</div>
       <div class="card-clef-badge" id="clefBadge">Treble</div>
+      <div class="key-pill" id="keyPill" style="display:none"></div>
       <svg id="staffSvg" width="300" height="220" viewBox="0 0 300 220" class="idle-staff"></svg>
     </div>
     <div class="feedback-banner idle" id="feedback">–</div>
-    <div class="note-btns" id="noteBtns"></div>
+    <div class="answer-btns cols-7" id="answerBtns"></div>
+    <div class="voice-row">
+      <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+        <span class="voice-dot"></span><span id="voiceBtnLabel">Voice off</span>
+      </button>
+      <span class="voice-heard" id="voiceHeard"></span>
+    </div>
     <div class="progress-row" id="progressDots"></div>
   </div>
+
   <div class="right-col">
     <div class="panel">
       <div class="panel-title">Session timer</div>
@@ -130,16 +200,19 @@
         <div class="best-score">Best: <span id="bestDisplay">—</span></div>
       </div>
     </div>
+
     <div class="panel">
       <div class="panel-title">Live metrics</div>
       <div class="metrics-grid">
         <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-value" id="mAccuracy">—</div></div>
-        <div class="metric"><div class="metric-label">Sec / note</div><div class="metric-value" id="mSpeed">—</div></div>
+        <div class="metric"><div class="metric-label">Sec / card</div><div class="metric-value" id="mSpeed">—</div></div>
         <div class="metric"><div class="metric-label">Correct</div><div class="metric-value good" id="mCorrect">—</div></div>
         <div class="metric"><div class="metric-label">Wrong</div><div class="metric-value bad" id="mWrong">—</div></div>
       </div>
     </div>
-    <div class="panel">
+
+    <!-- Notes mode settings -->
+    <div class="panel" id="notesSettings">
       <div class="panel-title">Settings</div>
       <div class="settings-grid">
         <div class="setting-row"><label>Clef</label>
@@ -147,6 +220,21 @@
             <option value="treble">Treble clef</option>
             <option value="bass">Bass clef</option>
             <option value="grand">Grand staff</option>
+          </select>
+        </div>
+        <div class="setting-row"><label>Key</label>
+          <select id="selKey">
+            <option value="C">C major</option>
+            <option value="G">G major (1♯)</option>
+            <option value="D">D major (2♯)</option>
+            <option value="A">A major (3♯)</option>
+            <option value="E">E major (4♯)</option>
+            <option value="B">B major (5♯)</option>
+            <option value="F#">F♯ major (6♯)</option>
+            <option value="F">F major (1♭)</option>
+            <option value="Bb">B♭ major (2♭)</option>
+            <option value="Eb">E♭ major (3♭)</option>
+            <option value="Ab">A♭ major (4♭)</option>
           </select>
         </div>
         <div class="setting-row"><label>Difficulty</label>
@@ -166,6 +254,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Intervals mode settings -->
+    <div class="panel" id="intervalsSettings" style="display:none">
+      <div class="panel-title">Interval settings</div>
+      <div class="settings-grid">
+        <div class="setting-row"><label>Clef</label>
+          <select id="iSelClef">
+            <option value="treble">Treble clef</option>
+            <option value="bass">Bass clef</option>
+          </select>
+        </div>
+        <div class="setting-row"><label>Range</label>
+          <select id="iSelRange">
+            <option value="3">Up to 3rd</option>
+            <option value="5" selected>Up to 5th</option>
+            <option value="8">Up to octave</option>
+          </select>
+        </div>
+        <div class="setting-row"><label>Cards</label>
+          <select id="iSelCount">
+            <option value="20">20 cards</option>
+            <option value="30" selected>30 cards</option>
+            <option value="40">40 cards</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-primary" onclick="startQuiz()">Start session</button>
   </div>
 </main>
@@ -174,16 +290,41 @@
 <div id="setupOverlay" class="overlay">
   <div class="overlay-box">
     <h1>Sight Reading 101</h1>
-    <p>Sharpen your note recognition with timed flashcard drills. Choose your settings and begin.</p>
+    <p>Enter your name so your scores are saved. Then choose your settings and begin.</p>
     <div class="setup-fields">
-      <div class="setup-field"><label>Clef</label>
+      <div class="setup-field full">
+        <label>Your name</label>
+        <input type="text" id="ovName" placeholder="e.g. Alex" maxlength="30">
+      </div>
+    </div>
+    <div class="setup-section">Notes mode</div>
+    <div class="setup-fields">
+      <div class="setup-field">
+        <label>Clef</label>
         <select id="ovClef">
           <option value="treble">Treble clef</option>
           <option value="bass">Bass clef</option>
-          <option value="grand">Grand staff (both)</option>
+          <option value="grand">Grand staff</option>
         </select>
       </div>
-      <div class="setup-field"><label>Difficulty</label>
+      <div class="setup-field">
+        <label>Key signature</label>
+        <select id="ovKey">
+          <option value="C">C major</option>
+          <option value="G">G major (1♯)</option>
+          <option value="D">D major (2♯)</option>
+          <option value="A">A major (3♯)</option>
+          <option value="E">E major (4♯)</option>
+          <option value="B">B major (5♯)</option>
+          <option value="F#">F♯ major (6♯)</option>
+          <option value="F">F major (1♭)</option>
+          <option value="Bb">B♭ major (2♭)</option>
+          <option value="Eb">E♭ major (3♭)</option>
+          <option value="Ab">A♭ major (4♭)</option>
+        </select>
+      </div>
+      <div class="setup-field">
+        <label>Difficulty</label>
         <select id="ovDiff">
           <option value="0">Beginner — staff only</option>
           <option value="1" selected>Intermediate — 1 ledger</option>
@@ -191,7 +332,8 @@
           <option value="3">Expert — 4 ledger lines</option>
         </select>
       </div>
-      <div class="setup-field"><label>Cards per session</label>
+      <div class="setup-field">
+        <label>Cards per session</label>
         <select id="ovCount">
           <option value="20">20 cards</option>
           <option value="30" selected>30 cards</option>
@@ -216,7 +358,7 @@
     <div class="results-stats">
       <div class="results-stat"><div class="results-stat-val" id="resCorrect">—</div><div class="results-stat-lbl">Correct</div></div>
       <div class="results-stat"><div class="results-stat-val" id="resWrong">—</div><div class="results-stat-lbl">Wrong</div></div>
-      <div class="results-stat"><div class="results-stat-val" id="resTime">—</div><div class="results-stat-lbl">Total time</div></div>
+      <div class="results-stat"><div class="results-stat-val" id="resTime">—</div><div class="results-stat-lbl">Time</div></div>
     </div>
     <div class="results-missed" id="resMissed"></div>
     <div class="results-btns">
@@ -227,48 +369,130 @@
 </div>
 
 <script>
-// ── GEOMETRY ──────────────────────────────────────────────────────────────────
-const LINE_GAP = 16;
-const HALF = 8; // px per diatonic step
+// ═══════════════════════════════════════════════════════════════════════════
+// GEOMETRY
+// ═══════════════════════════════════════════════════════════════════════════
+const LINE_GAP=16, HALF=8;
+const SINGLE_TOP=60, GRAND_T_TOP=30, GRAND_B_TOP=170;
 
-// Grand staff: treble top=30, bass top=170 (gap between staves = 170-(30+64) = 76px)
-// This gap is wide enough that middle C ledger lines from each staff don't overlap.
-const SINGLE_TOP   = 60;
-const GRAND_T_TOP  = 30;
-const GRAND_B_TOP  = 170;
+// ═══════════════════════════════════════════════════════════════════════════
+// KEY SIGNATURES
+// ═══════════════════════════════════════════════════════════════════════════
+// Sharps/flats drawn on treble and bass staff at specific positions
+// sharps order: F C G D A E B  (each on specific line/space)
+// flats  order: B E A D G C F
 
-// ── NOTE POOLS ────────────────────────────────────────────────────────────────
-const TREBLE_POOL = {
-  0: ["E4","F4","G4","A4","B4","C5","D5","E5","F5"],
-  1: ["C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5"],
-  2: ["A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6"],
-  3: ["D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6","D6","E6","F6"]
+const KEY_SIGS = {
+  'C':  {acc:[],       type:'sharp'},
+  'G':  {acc:['F'],    type:'sharp'},
+  'D':  {acc:['F','C'],type:'sharp'},
+  'A':  {acc:['F','C','G'],type:'sharp'},
+  'E':  {acc:['F','C','G','D'],type:'sharp'},
+  'B':  {acc:['F','C','G','D','A'],type:'sharp'},
+  'F#': {acc:['F','C','G','D','A','E'],type:'sharp'},
+  'F':  {acc:['B'],    type:'flat'},
+  'Bb': {acc:['B','E'],type:'flat'},
+  'Eb': {acc:['B','E','A'],type:'flat'},
+  'Ab': {acc:['B','E','A','D'],type:'flat'},
 };
-const BASS_POOL = {
-  0: ["G2","A2","B2","C3","D3","E3","F3","G3","A3"],
-  1: ["E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4"],
-  2: ["C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4"],
-  3: ["E1","F1","G1","A1","B1","C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4"]
-};
 
-function buildGrandPool(d) {
-  return [
-    ...TREBLE_POOL[d].map(n=>({note:n,clef:'treble'})),
-    ...BASS_POOL[d].map(n=>({note:n,clef:'bass'}))
-  ];
+// Treble staff positions (y offset from staffTop) for each sharp/flat symbol
+// Sharps on treble: F5(line5)=y0, C5(sp3)=y+8, G5(above)=y-8, D5(line4)=y+16, A4(sp2)=y+24, E5(sp4)=y+8... 
+// Using canonical engraving positions (staff-top relative):
+const TREBLE_SHARP_Y  = {F:0,  C:16, G:-8, D:24, A:8,  E:-8+16, B:8}; // y relative to staffTop, line 1=0
+const TREBLE_FLAT_Y   = {B:8,  E:24, A:8,  D:24, G:8,  C:24,    F:16};
+// Bass staff positions
+const BASS_SHARP_Y    = {F:16, C:32, G:8,  D:24, A:16, E:8,     B:24};
+const BASS_FLAT_Y     = {B:24, E:16, A:32, D:24, G:16, C:32,    F:24};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NOTE POOLS
+// ═══════════════════════════════════════════════════════════════════════════
+const TREBLE_POOL={
+  0:["E4","F4","G4","A4","B4","C5","D5","E5","F5"],
+  1:["C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5"],
+  2:["A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6"],
+  3:["D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6","D6","E6","F6"]
+};
+const BASS_POOL={
+  0:["G2","A2","B2","C3","D3","E3","F3","G3","A3"],
+  1:["E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4"],
+  2:["C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4"],
+  3:["E1","F1","G1","A1","B1","C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4"]
+};
+function buildGrandPool(d){
+  return [...TREBLE_POOL[d].map(n=>({note:n,clef:'treble'})),...BASS_POOL[d].map(n=>({note:n,clef:'bass'}))];
 }
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let clefMode,diff,totalCards,pool,queue;
+// Interval notes — root + interval on treble staff
+const INT_ROOT_POOL = ["C4","D4","E4","F4","G4","A4","B4","C5","D5","E5"];
+const INTERVAL_NAMES = ['Unison','2nd','3rd','4th','5th','6th','7th','Octave'];
+const DIATONIC = ['C','D','E','F','G','A','B'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let appMode='notes'; // 'notes' | 'intervals'
+let clefMode,keyMode,diff,totalCards,pool,queue;
 let cardIndex,correctCount,wrongCount,wrongNotes,missedMap;
 let timerInterval,elapsedSeconds,sessionStart,answered;
-let currentNote,currentClef;
+let currentNote,currentClef,currentInterval; // interval mode
+let iClef,iRange;
+let studentName='';
 
-// ── BEST SCORES ───────────────────────────────────────────────────────────────
-function bestKey(){ return `sr101_${clefMode}_${diff}_${totalCards}`; }
-function loadBest(){
-  try{ return JSON.parse(localStorage.getItem(bestKey()))||null; }catch(e){return null;}
+// Voice
+let recognition=null, voiceActive=false;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════
+function switchMode(mode){
+  appMode=mode;
+  document.getElementById('tabNotes').classList.toggle('active',mode==='notes');
+  document.getElementById('tabIntervals').classList.toggle('active',mode==='intervals');
+  document.getElementById('notesSettings').style.display=mode==='notes'?'':'none';
+  document.getElementById('intervalsSettings').style.display=mode==='intervals'?'':'none';
+  resetUI();
 }
+
+function resetUI(){
+  clearInterval(timerInterval);
+  document.getElementById('staffSvg').classList.add('idle-staff');
+  document.getElementById('staffSvg').innerHTML='';
+  document.getElementById('progressDots').innerHTML='';
+  document.getElementById('answerBtns').innerHTML='';
+  setFeedback('','idle');
+  document.getElementById('timerSec').textContent='0';
+  document.getElementById('cardNum').textContent='—';
+  document.getElementById('cardTotal').textContent='—';
+  ['mAccuracy','mSpeed','mCorrect','mWrong'].forEach(id=>document.getElementById(id).textContent='—');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STUDENT NAME
+// ═══════════════════════════════════════════════════════════════════════════
+function loadStudentName(){
+  try{return localStorage.getItem('sr101_student')||'';}catch(e){return '';}
+}
+function saveStudentName(n){
+  studentName=n;
+  try{localStorage.setItem('sr101_student',n);}catch(e){}
+  document.getElementById('studentBadge').textContent=n?'Student: '+n:'Student: —';
+}
+function promptStudentName(){
+  const n=prompt('Enter your name:',studentName);
+  if(n!==null)saveStudentName(n.trim().slice(0,30));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BEST SCORES
+// ═══════════════════════════════════════════════════════════════════════════
+function bestKey(){
+  const prefix=studentName?studentName+'_':'';
+  if(appMode==='notes') return `sr101_${prefix}n_${clefMode}_${keyMode}_${diff}_${totalCards}`;
+  return `sr101_${prefix}i_${iClef}_${iRange}_${totalCards}`;
+}
+function loadBest(){try{return JSON.parse(localStorage.getItem(bestKey()))||null;}catch(e){return null;}}
 function saveBest(pct,elapsed){
   const prev=loadBest();
   if(!prev||pct>prev.pct||(pct===prev.pct&&elapsed<prev.elapsed)){
@@ -279,66 +503,131 @@ function saveBest(pct,elapsed){
 }
 function showBestPanel(){
   const b=loadBest();
-  document.getElementById('bestDisplay').textContent = b ? `${b.pct}% in ${b.elapsed}s` : '—';
+  document.getElementById('bestDisplay').textContent=b?`${b.pct}% in ${b.elapsed}s`:'—';
 }
 
-// ── SETUP ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════════════════════════════════
 function launchFromOverlay(){
-  ['Clef','Diff','Count'].forEach(k=>{
-    document.getElementById('sel'+k).value=document.getElementById('ov'+k).value;
-  });
+  const name=document.getElementById('ovName').value.trim().slice(0,30);
+  saveStudentName(name);
+  // sync overlay selects → sidebar selects
+  document.getElementById('selClef').value=document.getElementById('ovClef').value;
+  document.getElementById('selKey').value=document.getElementById('ovKey').value;
+  document.getElementById('selDiff').value=document.getElementById('ovDiff').value;
+  document.getElementById('selCount').value=document.getElementById('ovCount').value;
   document.getElementById('setupOverlay').style.display='none';
   startQuiz();
 }
 
 function startQuiz(){
-  clefMode   = document.getElementById('selClef').value;
-  diff       = parseInt(document.getElementById('selDiff').value);
-  totalCards = parseInt(document.getElementById('selCount').value);
+  if(appMode==='notes') startNotesQuiz();
+  else startIntervalsQuiz();
+}
 
-  const rawPool = clefMode==='grand' ? buildGrandPool(diff)
-    : (clefMode==='treble'?TREBLE_POOL[diff]:BASS_POOL[diff]).map(n=>({note:n,clef:clefMode}));
-  pool = rawPool;
-  queue = Array.from({length:totalCards},()=>pool[Math.floor(Math.random()*pool.length)]);
+function startNotesQuiz(){
+  clefMode=document.getElementById('selClef').value;
+  keyMode=document.getElementById('selKey').value;
+  diff=parseInt(document.getElementById('selDiff').value);
+  totalCards=parseInt(document.getElementById('selCount').value);
 
+  const rawPool=clefMode==='grand'?buildGrandPool(diff)
+    :(clefMode==='treble'?TREBLE_POOL[diff]:BASS_POOL[diff]).map(n=>({note:n,clef:clefMode}));
+  pool=rawPool;
+  queue=Array.from({length:totalCards},()=>pool[Math.floor(Math.random()*pool.length)]);
+
+  initSession();
+
+  const clefLabels={treble:'Treble',bass:'Bass',grand:'Grand'};
+  document.getElementById('clefBadge').textContent=clefLabels[clefMode];
+
+  // Key pill
+  const kp=document.getElementById('keyPill');
+  if(keyMode==='C'){kp.style.display='none';}
+  else{kp.style.display='';kp.textContent=keyMode+' major';}
+
+  const svg=document.getElementById('staffSvg');
+  const card=document.getElementById('noteCard');
+  if(clefMode==='grand'){
+    svg.setAttribute('height','310');svg.setAttribute('viewBox','0 0 300 310');card.style.minHeight='390px';
+  } else {
+    svg.setAttribute('height','220');svg.setAttribute('viewBox','0 0 300 220');card.style.minHeight='300px';
+  }
+
+  // Build 7 note buttons
+  const btns=document.getElementById('answerBtns');
+  btns.className='answer-btns cols-7';btns.innerHTML='';
+  ['C','D','E','F','G','A','B'].forEach(n=>{
+    const b=document.createElement('button');b.className='ans-btn';b.textContent=n;
+    b.onclick=()=>guessNote(n,b);btns.appendChild(b);
+  });
+
+  showCard();
+}
+
+function startIntervalsQuiz(){
+  iClef=document.getElementById('iSelClef').value;
+  iRange=parseInt(document.getElementById('iSelRange').value);
+  totalCards=parseInt(document.getElementById('iSelCount').value);
+  queue=buildIntervalQueue(totalCards,iRange);
+
+  initSession();
+  document.getElementById('clefBadge').textContent=iClef==='treble'?'Treble':'Bass';
+  document.getElementById('keyPill').style.display='none';
+  document.getElementById('staffSvg').setAttribute('height','220');
+  document.getElementById('staffSvg').setAttribute('viewBox','0 0 300 220');
+  document.getElementById('noteCard').style.minHeight='300px';
+
+  // Build interval buttons (up to iRange)
+  const btns=document.getElementById('answerBtns');
+  const labels=INTERVAL_NAMES.slice(0,iRange+1); // Unison through iRange
+  // Unison and 2nd–8th
+  const available=labels.slice(1); // skip Unison for typical drill; include if range>=1
+  const btnLabels=INTERVAL_NAMES.slice(1,iRange+1);
+  btns.className='answer-btns '+(btnLabels.length<=4?'cols-4':'cols-8');
+  btns.innerHTML='';
+  btnLabels.forEach(name=>{
+    const b=document.createElement('button');b.className='ans-btn';
+    b.style.fontSize='0.85rem';b.textContent=name;
+    b.onclick=()=>guessInterval(name,b);btns.appendChild(b);
+  });
+
+  showCard();
+}
+
+function buildIntervalQueue(n,maxInterval){
+  const q=[];
+  const roots=iClef==='treble'?INT_ROOT_POOL:INT_ROOT_POOL.map(n=>transposeNote(n,-14));
+  for(let i=0;i<n;i++){
+    const root=roots[Math.floor(Math.random()*roots.length)];
+    const size=1+Math.floor(Math.random()*maxInterval); // 1=2nd up to maxInterval
+    q.push({root,size}); // size: 1=2nd,2=3rd,...7=octave
+  }
+  return q;
+}
+
+function initSession(){
   cardIndex=0;correctCount=0;wrongCount=0;wrongNotes=[];missedMap={};answered=false;
   elapsedSeconds=0;sessionStart=Date.now();
-
   document.getElementById('resultsOverlay').style.display='none';
   document.getElementById('setupOverlay').style.display='none';
   document.getElementById('cardTotal').textContent=totalCards;
   document.getElementById('timerSec').textContent='0';
   document.getElementById('timerArc').setAttribute('stroke-dashoffset','264');
   document.getElementById('timerArc').setAttribute('stroke','#2D6A4F');
-
-  const clefLabels={treble:'Treble',bass:'Bass',grand:'Grand Staff'};
-  document.getElementById('clefBadge').textContent=clefLabels[clefMode];
-
-  const svg=document.getElementById('staffSvg');
-  const card=document.getElementById('noteCard');
-  if(clefMode==='grand'){
-    svg.setAttribute('height','310');svg.setAttribute('viewBox','0 0 300 310');
-    card.style.minHeight='390px';
-  } else {
-    svg.setAttribute('height','220');svg.setAttribute('viewBox','0 0 300 220');
-    card.style.minHeight='300px';
-  }
-  svg.classList.remove('idle-staff');
-
-  showBestPanel();buildButtons();buildDots();showCard();startTimer();
+  document.getElementById('staffSvg').classList.remove('idle-staff');
+  showBestPanel();
+  buildDots();
+  startTimer();
 }
 
 function restartSame(){document.getElementById('resultsOverlay').style.display='none';startQuiz();}
 function newSession(){document.getElementById('resultsOverlay').style.display='none';document.getElementById('setupOverlay').style.display='flex';}
 
-// ── BUTTONS & DOTS ────────────────────────────────────────────────────────────
-function buildButtons(){
-  const div=document.getElementById('noteBtns');div.innerHTML='';
-  ['C','D','E','F','G','A','B'].forEach(n=>{
-    const b=document.createElement('button');b.className='note-btn';b.textContent=n;
-    b.onclick=()=>guess(n,b);div.appendChild(b);
-  });
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// DOTS
+// ═══════════════════════════════════════════════════════════════════════════
 function buildDots(){
   const row=document.getElementById('progressDots');row.innerHTML='';
   for(let i=0;i<totalCards;i++){
@@ -346,46 +635,80 @@ function buildDots(){
   }
 }
 
-// ── CARD ──────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// NOTES MODE — CARD + GUESS
+// ═══════════════════════════════════════════════════════════════════════════
 function showCard(){
   if(cardIndex>=totalCards){endQuiz();return;}
-  if(wrongNotes.length>0&&Math.random()<0.35)
-    queue[cardIndex]=wrongNotes[Math.floor(Math.random()*wrongNotes.length)];
-  const entry=queue[cardIndex];
-  currentNote=entry.note;currentClef=entry.clef;
+  if(appMode==='notes'){
+    if(wrongNotes.length>0&&Math.random()<0.35)
+      queue[cardIndex]=wrongNotes[Math.floor(Math.random()*wrongNotes.length)];
+    const entry=queue[cardIndex];
+    currentNote=entry.note;currentClef=entry.clef;
+    drawStaff(currentNote,currentClef,keyMode);
+  } else {
+    if(wrongNotes.length>0&&Math.random()<0.35)
+      queue[cardIndex]=wrongNotes[Math.floor(Math.random()*wrongNotes.length)];
+    const entry=queue[cardIndex];
+    currentInterval=entry;
+    drawIntervalStaff(entry.root,entry.size,iClef);
+  }
   answered=false;
   document.getElementById('cardNum').textContent=cardIndex+1;
   setFeedback('','idle');
-  document.querySelectorAll('.note-btn').forEach(b=>{b.className='note-btn';b.disabled=false;});
-  drawStaff(currentNote,currentClef);
+  document.querySelectorAll('.ans-btn').forEach(b=>{b.className='ans-btn';b.disabled=false;});
   updateMetrics();
 }
 
-// ── GUESS ─────────────────────────────────────────────────────────────────────
-function guess(noteName,btn){
+function guessNote(noteName,btn){
   if(answered)return;answered=true;
   const correctName=currentNote[0];
   const isCorrect=noteName===correctName;
   const entry=queue[cardIndex];
   document.getElementById('dot'+cardIndex).className='dot '+(isCorrect?'ok':'bad');
   if(isCorrect){
-    correctCount++;btn.className='note-btn correct-flash';setFeedback('Correct!','correct');
+    correctCount++;btn.className='ans-btn correct-flash';setFeedback('Correct!','correct');
     wrongNotes=wrongNotes.filter(w=>!(w.note===entry.note&&w.clef===entry.clef));
   } else {
-    wrongCount++;btn.className='note-btn wrong-flash';setFeedback('That was '+correctName,'wrong');
+    wrongCount++;btn.className='ans-btn wrong-flash';setFeedback('That was '+correctName,'wrong');
     if(!wrongNotes.find(w=>w.note===entry.note&&w.clef===entry.clef))wrongNotes.push(entry);
     missedMap[entry.clef+':'+entry.note]=(missedMap[entry.clef+':'+entry.note]||0)+1;
-    document.querySelectorAll('.note-btn').forEach(b=>{if(b.textContent===correctName)b.className='note-btn correct-flash';});
+    document.querySelectorAll('.ans-btn').forEach(b=>{if(b.textContent===correctName)b.className='ans-btn correct-flash';});
   }
   updateMetrics();
-  setTimeout(()=>{cardIndex++;showCard();},500); // 500ms — snappy advance
+  setTimeout(()=>{cardIndex++;showCard();},250);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INTERVALS MODE — CARD + GUESS
+// ═══════════════════════════════════════════════════════════════════════════
+function guessInterval(intervalName,btn){
+  if(answered)return;answered=true;
+  const entry=queue[cardIndex];
+  // size: 1=2nd,2=3rd,3=4th,4=5th,5=6th,6=7th,7=octave
+  const correctName=INTERVAL_NAMES[entry.size]; // e.g. size=1→'2nd'
+  const isCorrect=intervalName===correctName;
+  document.getElementById('dot'+cardIndex).className='dot '+(isCorrect?'ok':'bad');
+  if(isCorrect){
+    correctCount++;btn.className='ans-btn correct-flash';setFeedback('Correct — '+correctName,'correct');
+    wrongNotes=wrongNotes.filter(w=>!(w.root===entry.root&&w.size===entry.size));
+  } else {
+    wrongCount++;btn.className='ans-btn wrong-flash';setFeedback('That was a '+correctName,'wrong');
+    if(!wrongNotes.find(w=>w.root===entry.root&&w.size===entry.size))wrongNotes.push(entry);
+    missedMap[correctName]=(missedMap[correctName]||0)+1;
+    document.querySelectorAll('.ans-btn').forEach(b=>{if(b.textContent===correctName)b.className='ans-btn correct-flash';});
+  }
+  updateMetrics();
+  setTimeout(()=>{cardIndex++;showCard();},250);
 }
 
 function setFeedback(msg,cls){
   const el=document.getElementById('feedback');el.textContent=msg||'–';el.className='feedback-banner '+cls;
 }
 
-// ── METRICS ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// METRICS + TIMER
+// ═══════════════════════════════════════════════════════════════════════════
 function updateMetrics(){
   const done=correctCount+wrongCount;
   const acc=done>0?Math.round(correctCount/done*100):null;
@@ -401,9 +724,7 @@ function updateMetrics(){
   document.getElementById('mWrong').textContent=wrongCount||'—';
 }
 
-// ── TIMER — counts up ─────────────────────────────────────────────────────────
-// Ring fills over a "target pace" of 5s/card. Past target it stays full and turns gold.
-const ARC=2*Math.PI*42; // 264
+const ARC=2*Math.PI*42;
 function startTimer(){
   clearInterval(timerInterval);elapsedSeconds=0;
   timerInterval=setInterval(()=>{elapsedSeconds++;updateTimer();},1000);
@@ -412,12 +733,13 @@ function updateTimer(){
   document.getElementById('timerSec').textContent=elapsedSeconds;
   const target=totalCards*5;
   const pct=Math.min(1,elapsedSeconds/target);
-  const arc=document.getElementById('timerArc');
-  arc.setAttribute('stroke-dashoffset',(ARC*(1-pct)).toFixed(1));
-  arc.setAttribute('stroke',pct<1?'#2D6A4F':'#B5860D');
+  document.getElementById('timerArc').setAttribute('stroke-dashoffset',(ARC*(1-pct)).toFixed(1));
+  document.getElementById('timerArc').setAttribute('stroke',pct<1?'#2D6A4F':'#B5860D');
 }
 
-// ── END / RESULTS ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════════════════════
 function endQuiz(){
   clearInterval(timerInterval);
   const done=correctCount+wrongCount;
@@ -429,18 +751,19 @@ function endQuiz(){
   document.getElementById('resCorrect').textContent=correctCount;
   document.getElementById('resWrong').textContent=wrongCount;
   document.getElementById('resTime').textContent=elapsed+'s';
-  const newRecord=saveBest(pct,elapsed);
+  const isNew=saveBest(pct,elapsed);
   const prev=loadBest();
   const bestEl=document.getElementById('resBest');
-  if(newRecord){bestEl.innerHTML='🏅 New personal best!';}
-  else if(prev){bestEl.innerHTML=`Personal best: <strong>${prev.pct}% in ${prev.elapsed}s</strong>`;}
-  else{bestEl.textContent='';}
+  if(isNew)bestEl.innerHTML='🏅 New personal best!';
+  else if(prev)bestEl.innerHTML=`Personal best: <strong>${prev.pct}% in ${prev.elapsed}s</strong>`;
+  else bestEl.textContent='';
   showBestPanel();
   const missed=Object.entries(missedMap).sort((a,b)=>b[1]-a[1]);
   const missedEl=document.getElementById('resMissed');
-  if(missed.length===0){missedEl.innerHTML='No notes missed — excellent work!';}
+  if(missed.length===0){missedEl.innerHTML='No errors — excellent work!';}
   else{
     const top=missed.slice(0,6).map(([k,c])=>{
+      if(appMode==='intervals')return `<strong>${k}</strong> ×${c}`;
       const[cl,nid]=k.split(':');
       const tag=clefMode==='grand'?(cl==='treble'?' (T)':' (B)'):'';
       return `<strong>${nid[0]}${tag}</strong> ×${c}`;
@@ -450,125 +773,227 @@ function endQuiz(){
   document.getElementById('resultsOverlay').style.display='flex';
 }
 
-// ── STAFF DRAWING ─────────────────────────────────────────────────────────────
-function noteToStep(n){
-  return (parseInt(n.slice(1))-4)*7+['C','D','E','F','G','A','B'].indexOf(n[0]);
+// ═══════════════════════════════════════════════════════════════════════════
+// VOICE RECOGNITION
+// ═══════════════════════════════════════════════════════════════════════════
+function initVoice(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    document.getElementById('voiceBtn').classList.add('unsupported');
+    document.getElementById('voiceBtnLabel').textContent='Voice N/A';
+    return;
+  }
+  recognition=new SpeechRecognition();
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  recognition.lang='en-US';
+  recognition.onresult=e=>{
+    let heard='';
+    for(let i=e.resultIndex;i<e.results.length;i++)
+      if(e.results[i].isFinal)heard+=e.results[i][0].transcript;
+    if(!heard)return;
+    heard=heard.trim().toUpperCase();
+    document.getElementById('voiceHeard').textContent=heard.slice(0,8);
+    // Match note name A-G
+    const noteMatch=heard.match(/\b([A-G])\b/);
+    if(noteMatch&&appMode==='notes'&&!answered){
+      const btn=Array.from(document.querySelectorAll('.ans-btn')).find(b=>b.textContent===noteMatch[1]);
+      if(btn)btn.click();
+    }
+    // Match interval name
+    if(appMode==='intervals'&&!answered){
+      const iNames=['UNISON','SECOND','2ND','THIRD','3RD','FOURTH','4TH','FIFTH','5TH','SIXTH','6TH','SEVENTH','7TH','OCTAVE'];
+      const iMap={'UNISON':'Unison','SECOND':'2nd','2ND':'2nd','THIRD':'3rd','3RD':'3rd','FOURTH':'4th','4TH':'4th','FIFTH':'5th','5TH':'5th','SIXTH':'6th','6TH':'6th','SEVENTH':'7th','7TH':'7th','OCTAVE':'Octave'};
+      for(const w of heard.split(/\s+/)){
+        if(iMap[w]){
+          const btn=Array.from(document.querySelectorAll('.ans-btn')).find(b=>b.textContent===iMap[w]);
+          if(btn){btn.click();break;}
+        }
+      }
+    }
+  };
+  recognition.onerror=()=>{};
 }
 
-function stepToY(step,staffTop,clef){
-  if(clef==='treble'){
-    // C4=step 0 → y = staffTop+5*LINE_GAP (one ledger below E4 bottom line)
-    return (staffTop+5*LINE_GAP)-step*HALF;
+function toggleVoice(){
+  const btn=document.getElementById('voiceBtn');
+  if(btn.classList.contains('unsupported'))return;
+  if(!recognition)initVoice();
+  voiceActive=!voiceActive;
+  if(voiceActive){
+    try{recognition.start();}catch(e){}
+    btn.classList.add('listening');
+    document.getElementById('voiceBtnLabel').textContent='Listening…';
   } else {
-    // Bass top line A3=step -2 → y=staffTop
-    return staffTop-(step-(-2))*HALF;
+    try{recognition.stop();}catch(e){}
+    btn.classList.remove('listening');
+    document.getElementById('voiceBtnLabel').textContent='Voice off';
+    document.getElementById('voiceHeard').textContent='';
   }
 }
 
-// Determine the diatonic step values of each staff line
-// Treble lines (bottom to top): E4=2, G4=4, B4=6, D5=8, F5=10
-// Bass lines (bottom to top):   G2=-9, B2=-7, D3=-5, F3=-3, A3=-2 ... wait
-// Bass lines correctly: G2,B2,D3,F3,A3
-// G2: (2-4)*7+4 = -14+4=-10? Let me recompute:
-// G2: oct=2, (2-4)*7=−14, G=4 → step=-14+4=-10
-// B2: oct=2, B=6 → -14+6=-8
-// D3: oct=3, D=1 → (3-4)*7+1=-7+1=-6
-// F3: oct=3, F=3 → -7+3=-4
-// A3: oct=3, A=5 → -7+5=-2  ✓ (matches our anchor)
-// So bass lines at steps: -10,-8,-6,-4,-2 (bottom to top)
-// Bass spaces: A2=-9, C3=-7, E3=-5, G3=-3
-
-// For ledger line drawing we only need the bottom and top LINE steps:
-// Treble: botLineStep=2 (E4), topLineStep=10 (F5)
-// Bass:   botLineStep=-10 (G2), topLineStep=-2 (A3)
+// ═══════════════════════════════════════════════════════════════════════════
+// STAFF DRAWING — NOTES MODE
+// ═══════════════════════════════════════════════════════════════════════════
+function noteToStep(n){return(parseInt(n.slice(1))-4)*7+['C','D','E','F','G','A','B'].indexOf(n[0]);}
+function stepToY(step,staffTop,clef){
+  if(clef==='treble')return(staffTop+5*LINE_GAP)-step*HALF;
+  return staffTop-(step-(-2))*HALF;
+}
 
 function drawLedgerLines(svg,mkEl,noteId,clef,staffTop,noteX,color){
   const step=noteToStep(noteId);
-  const botStep = clef==='treble' ? 2  : -10;
-  const topStep = clef==='treble' ? 10 : -2;
-
-  // Ledger lines BELOW staff: at botStep-2, botStep-4, ... down to note
-  // Only draw a ledger line at position ls if the note is AT or BELOW ls
-  // (i.e. step <= ls). Each ledger line position is 2 diatonic steps below prev.
-  if(step < botStep-1){
-    for(let ls=botStep-2; ls>=step-1; ls-=2){
-      if(step<=ls){
-        const ly=stepToY(ls,staffTop,clef);
-        svg.appendChild(mkEl('line',{x1:noteX-20,y1:ly,x2:noteX+20,y2:ly,stroke:color,'stroke-width':'1.3'}));
-      }
-    }
+  const botStep=clef==='treble'?2:-10;
+  const topStep=clef==='treble'?10:-2;
+  if(step<botStep-1){
+    for(let ls=botStep-2;ls>=step-1;ls-=2)
+      if(step<=ls){const ly=stepToY(ls,staffTop,clef);svg.appendChild(mkEl('line',{x1:noteX-20,y1:ly,x2:noteX+20,y2:ly,stroke:color,'stroke-width':'1.3'}));}
   }
-
-  // Ledger lines ABOVE staff: at topStep+2, topStep+4, ... up to note
-  if(step > topStep+1){
-    for(let ls=topStep+2; ls<=step+1; ls+=2){
-      if(step>=ls){
-        const ly=stepToY(ls,staffTop,clef);
-        svg.appendChild(mkEl('line',{x1:noteX-20,y1:ly,x2:noteX+20,y2:ly,stroke:color,'stroke-width':'1.3'}));
-      }
-    }
+  if(step>topStep+1){
+    for(let ls=topStep+2;ls<=step+1;ls+=2)
+      if(step>=ls){const ly=stepToY(ls,staffTop,clef);svg.appendChild(mkEl('line',{x1:noteX-20,y1:ly,x2:noteX+20,y2:ly,stroke:color,'stroke-width':'1.3'}));}
   }
 }
 
-function drawSingleStaff(svg,mkEl,noteId,clef,staffTop,noteX,lineCol,ledgerCol,noteCol,clefCol,active){
-  // Staff lines
+// Draw key signature accidentals
+function drawKeySig(svg,mkEl,clef,staffTop,key,startX){
+  const sig=KEY_SIGS[key];if(!sig||sig.acc.length===0)return startX;
+  const yMap=clef==='treble'?(sig.type==='sharp'?TREBLE_SHARP_Y:TREBLE_FLAT_Y):(sig.type==='sharp'?BASS_SHARP_Y:BASS_FLAT_Y);
+  const sym=sig.type==='sharp'?'♯':'♭';
+  let x=startX;
+  sig.acc.forEach(note=>{
+    const y=staffTop+(yMap[note]||0);
+    svg.appendChild(mkEl('text',{x,y:y+10,'font-size':'14','font-family':'Georgia,serif',fill:'rgba(26,26,46,0.75)','text-anchor':'middle','dominant-baseline':'auto'},sym));
+    x+=13;
+  });
+  return x+4; // return x position after key sig for note placement
+}
+
+function drawSingleStaff(svg,mkEl,noteId,clef,staffTop,noteX,lineCol,ledgerCol,noteCol,clefCol,active,key){
   for(let i=0;i<5;i++){
     const y=staffTop+i*LINE_GAP;
     svg.appendChild(mkEl('line',{x1:46,y1:y,x2:285,y2:y,stroke:lineCol,'stroke-width':'1'}));
   }
-  // Clef glyph
+  // Clef
   if(clef==='treble'){
     svg.appendChild(mkEl('text',{x:58,y:staffTop+4*LINE_GAP+12,'font-size':'64','font-family':'Georgia,serif',fill:clefCol,'text-anchor':'middle','dominant-baseline':'alphabetic'},'𝄞'));
   } else {
     svg.appendChild(mkEl('text',{x:60,y:staffTop+LINE_GAP+4,'font-size':'45','font-family':'Georgia,serif',fill:clefCol,'text-anchor':'middle','dominant-baseline':'middle'},'𝄢'));
   }
-  if(!active) return; // dimmed staff — stop here
-  // Ledger lines
+  // Key signature
+  if(key&&key!=='C') drawKeySig(svg,mkEl,clef,staffTop,key,78);
+  if(!active)return;
   drawLedgerLines(svg,mkEl,noteId,clef,staffTop,noteX,ledgerCol);
-  // Note
   const step=noteToStep(noteId);
   const noteY=stepToY(step,staffTop,clef);
   svg.appendChild(mkEl('ellipse',{cx:noteX,cy:noteY,rx:10,ry:7,fill:noteCol,transform:`rotate(-15,${noteX},${noteY})`}));
-  // Stem
   const midStep=clef==='treble'?noteToStep('B4'):noteToStep('D3');
   const up=step<=midStep;
-  if(up){ svg.appendChild(mkEl('line',{x1:noteX+9,y1:noteY-5,x2:noteX+9,y2:noteY-46,stroke:noteCol,'stroke-width':'1.5'})); }
-  else  { svg.appendChild(mkEl('line',{x1:noteX-9,y1:noteY+5,x2:noteX-9,y2:noteY+46,stroke:noteCol,'stroke-width':'1.5'})); }
+  if(up)svg.appendChild(mkEl('line',{x1:noteX+9,y1:noteY-5,x2:noteX+9,y2:noteY-46,stroke:noteCol,'stroke-width':'1.5'}));
+  else  svg.appendChild(mkEl('line',{x1:noteX-9,y1:noteY+5,x2:noteX-9,y2:noteY+46,stroke:noteCol,'stroke-width':'1.5'}));
 }
 
-function drawStaff(noteId,clef){
-  const svg=document.getElementById('staffSvg');
-  svg.innerHTML='';
-  const lc='rgba(26,26,46,0.28)', ldc='rgba(26,26,46,0.5)';
-  const nc='#2D6A4F', dim='rgba(26,26,46,0.10)';
-  const cc='rgba(26,26,46,0.72)', dcc='rgba(26,26,46,0.15)';
+function drawStaff(noteId,clef,key){
+  const svg=document.getElementById('staffSvg');svg.innerHTML='';
+  const lc='rgba(26,26,46,0.28)',ldc='rgba(26,26,46,0.5)',nc='#2D6A4F';
+  const dim='rgba(26,26,46,0.10)',cc='rgba(26,26,46,0.72)',dcc='rgba(26,26,46,0.15)';
+  const nx=195;
+  function mkEl(tag,attrs,text){
+    const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);
+    if(text!==undefined)e.textContent=text;return e;
+  }
+  if(clefMode==='grand'){
+    const isT=clef==='treble';
+    const bTop=GRAND_T_TOP,bBot=GRAND_B_TOP+4*LINE_GAP;
+    svg.appendChild(mkEl('line',{x1:30,y1:bTop,x2:30,y2:bBot,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
+    svg.appendChild(mkEl('line',{x1:30,y1:bTop,x2:38,y2:bTop,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
+    svg.appendChild(mkEl('line',{x1:30,y1:bBot,x2:38,y2:bBot,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
+    drawSingleStaff(svg,mkEl,noteId,'treble',GRAND_T_TOP,nx,isT?lc:dim,ldc,nc,isT?cc:dcc,isT,key);
+    drawSingleStaff(svg,mkEl,noteId,'bass',GRAND_B_TOP,nx,!isT?lc:dim,ldc,nc,!isT?cc:dcc,!isT,key);
+    const lY=isT?GRAND_T_TOP-12:GRAND_B_TOP-12;
+    svg.appendChild(mkEl('text',{x:165,y:lY,'font-size':'10','font-family':'DM Sans,sans-serif',fill:'rgba(26,26,46,0.35)','text-anchor':'middle'},isT?'▲ treble clef':'▼ bass clef'));
+  } else {
+    drawSingleStaff(svg,mkEl,noteId,clef,SINGLE_TOP,nx,lc,ldc,nc,cc,true,key);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STAFF DRAWING — INTERVALS MODE
+// ═══════════════════════════════════════════════════════════════════════════
+function transposeNote(noteStr,steps){
+  // Transpose diatonic steps (positive=up, negative=down)
+  const letters=['C','D','E','F','G','A','B'];
+  const letter=noteStr[0];
+  const oct=parseInt(noteStr.slice(1));
+  const idx=letters.indexOf(letter);
+  const total=idx+steps;
+  const newIdx=((total%7)+7)%7;
+  const octShift=Math.floor(total/7);
+  return letters[newIdx]+(oct+octShift);
+}
+
+function drawIntervalStaff(rootNote,intervalSize,clef){
+  // intervalSize: 1=2nd,2=3rd,...7=octave (diatonic steps above root)
+  const topNote=transposeNote(rootNote,intervalSize);
+  const svg=document.getElementById('staffSvg');svg.innerHTML='';
+  const staffTop=SINGLE_TOP;
+  const lc='rgba(26,26,46,0.28)',ldc='rgba(26,26,46,0.5)';
+  const rootCol='#2D6A4F',topCol='#534AB7'; // green root, purple top
+  const cc='rgba(26,26,46,0.72)';
   const nx=195;
 
   function mkEl(tag,attrs,text){
     const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
     for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);
-    if(text!==undefined)e.textContent=text;
-    return e;
+    if(text!==undefined)e.textContent=text;return e;
   }
-
-  if(clefMode==='grand'){
-    const isT=clef==='treble';
-    // Bracket
-    const bTop=GRAND_T_TOP, bBot=GRAND_B_TOP+4*LINE_GAP;
-    svg.appendChild(mkEl('line',{x1:30,y1:bTop,x2:30,y2:bBot,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
-    svg.appendChild(mkEl('line',{x1:30,y1:bTop,x2:38,y2:bTop,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
-    svg.appendChild(mkEl('line',{x1:30,y1:bBot,x2:38,y2:bBot,stroke:'rgba(26,26,46,0.3)','stroke-width':'2.5'}));
-    // Treble
-    drawSingleStaff(svg,mkEl,noteId,'treble',GRAND_T_TOP,nx,isT?lc:dim,ldc,nc,isT?cc:dcc,isT);
-    // Bass
-    drawSingleStaff(svg,mkEl,noteId,'bass',GRAND_B_TOP,nx,!isT?lc:dim,ldc,nc,!isT?cc:dcc,!isT);
-    // Active label
-    const lY=isT?GRAND_T_TOP-12:GRAND_B_TOP-12;
-    svg.appendChild(mkEl('text',{x:165,y:lY,'font-size':'10','font-family':'DM Sans,sans-serif',fill:'rgba(26,26,46,0.35)','text-anchor':'middle'},isT?'▲ treble clef':'▼ bass clef'));
+  // Staff lines
+  for(let i=0;i<5;i++){
+    const y=staffTop+i*LINE_GAP;
+    svg.appendChild(mkEl('line',{x1:46,y1:y,x2:285,y2:y,stroke:lc,'stroke-width':'1'}));
+  }
+  // Clef
+  if(clef==='treble'){
+    svg.appendChild(mkEl('text',{x:58,y:staffTop+4*LINE_GAP+12,'font-size':'64','font-family':'Georgia,serif',fill:cc,'text-anchor':'middle','dominant-baseline':'alphabetic'},'𝄞'));
   } else {
-    drawSingleStaff(svg,mkEl,noteId,clef,SINGLE_TOP,nx,lc,ldc,nc,cc,true);
+    svg.appendChild(mkEl('text',{x:60,y:staffTop+LINE_GAP+4,'font-size':'45','font-family':'Georgia,serif',fill:cc,'text-anchor':'middle','dominant-baseline':'middle'},'𝄢'));
   }
+  // Draw both notes — root (filled green) and top (filled purple), stacked
+  function drawNote(noteId,col,x){
+    drawLedgerLines(svg,mkEl,noteId,clef,staffTop,x,ldc);
+    const step=noteToStep(noteId);
+    const ny=stepToY(step,staffTop,clef);
+    svg.appendChild(mkEl('ellipse',{cx:x,cy:ny,rx:10,ry:7,fill:col,transform:`rotate(-15,${x},${ny})`}));
+    // Stem — root always up-stem from right, top note same x but may overlap; use shared stem
+    return ny;
+  }
+  // Place root slightly left, top slightly right to avoid full overlap
+  const rootY=drawNote(rootNote,rootCol,nx-2);
+  const topY=drawNote(topNote,topCol,nx+2);
+  // Shared stem — from root note right side up to top note
+  const stemX=nx+10;
+  const stemTop=Math.min(rootY,topY)-5;
+  const stemBot=Math.max(rootY,topY)+5;
+  svg.appendChild(mkEl('line',{x1:stemX,y1:stemTop,x2:stemX,y2:stemBot,stroke:'rgba(26,26,46,0.5)','stroke-width':'1.5'}));
+  // Extend stem further up
+  svg.appendChild(mkEl('line',{x1:stemX,y1:stemTop,x2:stemX,y2:stemTop-30,stroke:rootCol,'stroke-width':'1.5'}));
+
+  // Small legend: "?" label prompting identification
+  svg.appendChild(mkEl('text',{x:240,y:staffTop+2*LINE_GAP,'font-size':'11','font-family':'DM Sans,sans-serif',fill:'rgba(26,26,46,0.35)','text-anchor':'middle'},'interval?'));
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+(function init(){
+  studentName=loadStudentName();
+  if(studentName){
+    document.getElementById('ovName').value=studentName;
+    document.getElementById('studentBadge').textContent='Student: '+studentName;
+  }
+  initVoice();
+})();
 </script>
 </body>
 </html>
