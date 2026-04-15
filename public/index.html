@@ -1056,32 +1056,86 @@ function drawStaffInterval(rootNote,intervalSize,clef){
 
 // ═══════════════════════════════════════════════════════════
 // DRAW — CHORDS MODE
-// Three stacked noteheads: root (green), third (purple), fifth (coral)
-// Accidental shown for dim (flat 5) and aug (sharp 5)
+// Correctly renders root-position triads with chromatic alterations.
+//
+// Strategy:
+//   - Always place root, third, fifth at their DIATONIC positions on the staff
+//     (same letter = same line/space, regardless of accidental)
+//   - Apply a Y nudge of ±4px (= one chromatic semitone visually) when the
+//     chord quality requires a chromatic alteration of that interval
+//   - Draw the accidental symbol (♭ or ♯) to the LEFT of the altered notehead
+//
+// Alterations by quality (relative to major scale intervals):
+//   Major   : root=0, third=+4semi (nat), fifth=+7semi (nat)  → no accidentals
+//   Minor   : root=0, third=+3semi (flat3),  fifth=+7semi (nat)  → ♭ on third
+//   Dim     : root=0, third=+3semi (flat3),  fifth=+6semi (flat5) → ♭ on third & fifth
+//   Aug     : root=0, third=+4semi (nat), fifth=+8semi (sharp5) → ♯ on fifth
+//
+// The Y nudge: flat = +4px (note moves DOWN = pitch lower), sharp = -4px (UP)
 // ═══════════════════════════════════════════════════════════
 function drawStaffChord(rootNote,chordType,clef){
   const svg=document.getElementById('staffSvg');svg.innerHTML='';
   const staffTop=svgLayout.staffTop;
   const lc='rgba(26,26,46,0.28)',ldc='rgba(26,26,46,0.5)',cc='rgba(26,26,46,0.72)';
   const nx=195;
-  // Build diatonic third and fifth
-  const third=transposeNote(rootNote,2);
-  const fifth=transposeNote(rootNote,4);
+
+  // Diatonic positions (letter names only — correct staff position)
+  const third=transposeNote(rootNote,2); // diatonic 3rd
+  const fifth=transposeNote(rootNote,4); // diatonic 5th
+
+  // Chromatic nudges per quality: [thirdNudge, fifthNudge] in px
+  // positive = move DOWN (flatten), negative = move UP (sharpen)
+  const nudges={
+    M:[0,  0 ],  // Major:      nat 3rd, nat 5th
+    m:[4,  0 ],  // Minor:      flat 3rd, nat 5th
+    d:[4,  4 ],  // Diminished: flat 3rd, flat 5th
+    a:[0, -4 ],  // Augmented:  nat 3rd, sharp 5th
+  };
+  const [thirdNudge,fifthNudge]=nudges[chordType.q]||[0,0];
+
+  // Accidental symbols to draw
+  const accidentals={
+    M:[null, null ],
+    m:['♭',  null ],
+    d:['♭',  '♭'  ],
+    a:[null, '♯'  ],
+  };
+  const [thirdAcc,fifthAcc]=accidentals[chordType.q]||[null,null];
+
+  const cols=['#2D6A4F','#534AB7','#C1440E']; // root=green, third=purple, fifth=coral
   const notes=[rootNote,third,fifth];
-  const cols=['#2D6A4F','#534AB7','#C1440E'];
-  drawStaffLines(svg,staffTop,lc);drawClef(svg,clef,staffTop,cc);
-  // Draw ledger lines for all three notes
+  const nudgeList=[0,thirdNudge,fifthNudge];
+  const accList=[null,thirdAcc,fifthAcc];
+
+  drawStaffLines(svg,staffTop,lc);
+  drawClef(svg,clef,staffTop,cc);
+
+  // Draw ledger lines at diatonic positions (not nudged — the note letter is the same)
   notes.forEach(n=>drawLedgerLines(svg,n,clef,staffTop,nx,ldc));
-  // Draw all three noteheads, collect Y positions
-  const ys=notes.map((n,i)=>drawNoteHead(svg,n,clef,staffTop,nx,cols[i]).ny);
-  // Shared stem
+
+  // Draw noteheads with Y nudge applied, collect actual Y for stem
+  const ys=notes.map((n,i)=>{
+    const step=noteToStep(n);
+    const baseY=stepToY(step,staffTop,clef);
+    const ny=baseY+nudgeList[i]; // apply chromatic shift
+    svg.appendChild(mkEl('ellipse',{cx:nx,cy:ny,rx:10,ry:7,fill:cols[i],transform:'rotate(-15,'+nx+','+ny+')'}));
+
+    // Draw accidental symbol to the left of this notehead if needed
+    if(accList[i]){
+      svg.appendChild(mkEl('text',{
+        x:nx-22, y:ny+5,
+        'font-size':'15','font-family':'Georgia,serif',
+        fill:cols[i], 'text-anchor':'middle',
+        'font-weight':'bold'
+      },accList[i]));
+    }
+    return ny;
+  });
+
+  // Shared stem spanning all three notes
   const stemX=nx+10,sTop=Math.min(...ys)-36,sBot=Math.max(...ys)+5;
   svg.appendChild(mkEl('line',{x1:stemX,y1:sTop,x2:stemX,y2:sBot,stroke:'rgba(26,26,46,0.4)','stroke-width':'1.5'}));
-  // Accidental on 5th for dim/aug
-  if(chordType.q==='d'||chordType.q==='a'){
-    const fifthStep=noteToStep(fifth),fifthY=stepToY(fifthStep,staffTop,clef);
-    svg.appendChild(mkEl('text',{x:nx-22,y:fifthY+5,'font-size':'14','font-family':'Georgia,serif',fill:'rgba(83,74,183,0.9)','text-anchor':'middle'},chordType.q==='d'?'♭':'♯'));
-  }
+
   // Prompt label
   svg.appendChild(mkEl('text',{x:248,y:staffTop+2*LINE_GAP,'font-size':'11','font-family':'DM Sans,sans-serif',fill:'rgba(26,26,46,0.28)','text-anchor':'middle'},cDiff===0?'root?':'chord?'));
 }
